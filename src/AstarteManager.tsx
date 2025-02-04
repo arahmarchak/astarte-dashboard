@@ -178,8 +178,25 @@ const AstarteProvider = ({
     client
       .getRealmManagementVersion()
       .then((version) => setRealmManagementVersion(version))
-      .catch(() => setRealmManagementVersion(null));
-  }, [client]);
+      .catch((error) => {
+        if (error.response && error.response.status === 401) {
+          setTimeout(() => logout(), 0);
+        }
+        setRealmManagementVersion(null);
+      });
+
+    client.getAppEngineVersion().catch((error) => {
+      if (error.response && error.response.status === 401) {
+        setTimeout(() => logout(), 0);
+      }
+    });
+
+    client.getPairingVersion().catch((error) => {
+      if (error.response && error.response.status === 401) {
+        setTimeout(() => logout(), 0);
+      }
+    });
+  }, [client, logout]);
 
   const triggerDeliveryPoliciesSupported = useMemo(
     () =>
