@@ -29,12 +29,12 @@ import useFetch from './hooks/useFetch';
 import Icon from './components/Icon';
 import WaitForData from './components/WaitForData';
 
-type ServiceStatus = 'loading' | 'ok' | 'err';
+type ServiceStatus = 'loading' | 'ok' | 'err' | 'warn';
 
 interface ServiceStatusRowProps {
   service: string;
   version?: string | null;
-  status: ServiceStatus;
+  status?: ServiceStatus;
 }
 
 const ServiceStatusRow = ({
@@ -55,6 +55,13 @@ const ServiceStatusRow = ({
       <td className="color-green">
         <Icon icon="statusOK" className="me-1" />
         This service is operating normally
+      </td>
+    );
+  } else if (status === 'warn') {
+    messageCell = (
+      <td className="color-yellow">
+        <Icon icon="statusExWarning" className="me-1" />
+        This service is operating normally but token is invalid
       </td>
     );
   } else {
@@ -111,10 +118,18 @@ const ApiStatusCard = ({
           <ServiceStatusRow
             service="Realm Management"
             version={realmManagementVersion}
-            status={realmManagement}
+            status={!realmManagementVersion ? 'warn' : realmManagement}
           />
-          <ServiceStatusRow service="AppEngine" version={appengineVersion} status={appengine} />
-          <ServiceStatusRow service="Pairing" version={pairingVersion} status={pairing} />
+          <ServiceStatusRow
+            service="AppEngine"
+            version={appengineVersion}
+            status={!appengineVersion ? 'warn' : appengine}
+          />
+          <ServiceStatusRow
+            service="Pairing"
+            version={pairingVersion}
+            status={!pairingVersion ? 'warn' : pairing}
+          />
           {showFlowStatus && flow && <ServiceStatusRow service="Flow" status={flow} />}
         </tbody>
       </Table>
@@ -139,7 +154,7 @@ const DevicesCard = ({
     <Card.Header as="h5">Devices</Card.Header>
     <Card.Body>
       <Container className="h-100 p-0" fluid>
-        <Row noGutters>
+        <Row className="g-0">
           <Col xs={12} lg={6}>
             <Card.Title>Connected devices</Card.Title>
             <Card.Text>
